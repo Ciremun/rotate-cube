@@ -5,5 +5,5 @@ authors = ["Ciremun <Ciremun@yandex.ru>"]
 edition = "2018"
 
 [dependencies]
-gl = "0.6.0"
+gl = "0.14.0"
 glfw = "0.41.0"
