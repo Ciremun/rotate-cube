@@ -7,3 +7,4 @@ edition = "2018"
 [dependencies]
 gl = "0.14.0"
 glfw = "0.41.0"
+glm = "0.2.3"
