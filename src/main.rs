@@ -4,27 +4,25 @@ use gl::types::*;
 use glfw::{Action, Context, Key};
 
 unsafe fn compile_shader(shader_id: GLuint, shader_c_string: &CStr) {
-    let mut result = 0;
-    let mut info_log_length: i32 = 0;
+    let mut compiled = 0;
 
     gl::ShaderSource(shader_id, 1, &shader_c_string.as_ptr(), std::ptr::null());
     gl::CompileShader(shader_id);
 
-    gl::GetShaderiv(shader_id, gl::COMPILE_STATUS, &mut result);
-    gl::GetShaderiv(shader_id, gl::INFO_LOG_LENGTH, &mut info_log_length);
+    gl::GetShaderiv(shader_id, gl::COMPILE_STATUS, &mut compiled);
 
-    if info_log_length > 0 {
-        let mut vertex_shader_error_message: Vec<char> =
-            Vec::with_capacity((info_log_length as usize) + 1);
+    if compiled != gl::TRUE.into() {
+        let mut buffer: [u8; 1024] = [0; 1024];
+        let mut length: GLsizei = 0;
         gl::GetShaderInfoLog(
             shader_id,
-            info_log_length,
-            0 as *mut i32,
-            vertex_shader_error_message.as_mut_ptr() as *mut i8,
+            buffer.len().try_into().unwrap(),
+            &mut length,
+            buffer.as_mut_ptr() as *mut i8,
         );
         panic!(
-            "{}",
-            vertex_shader_error_message.into_iter().collect::<String>()
+            "Could not compile shader: {}",
+            std::str::from_utf8(&buffer[0..length as usize]).unwrap()
         );
     }
 }
