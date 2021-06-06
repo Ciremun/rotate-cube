@@ -82,7 +82,7 @@ fn main() {
     let mut glfw = glfw::init(glfw::FAIL_ON_ERRORS).unwrap();
 
     let (mut window, events) = glfw
-        .create_window(800, 600, "Hello window", glfw::WindowMode::Windowed)
+        .create_window(1920, 1080, "uwu window", glfw::WindowMode::Windowed)
         .expect("Failed to create GLFW window.");
 
     window.set_key_polling(true);
@@ -111,9 +111,30 @@ fn main() {
         );
     }
 
+    let program_id: GLuint;
     unsafe {
-        let program_id = load_shaders();
+        program_id = load_shaders();
         gl::UseProgram(program_id);
+    }
+
+    let projection = glm::ext::perspective(glm::radians(90.0), (1920 / 1080) as f32, 0.1, 100.0);
+    let view = glm::ext::look_at(
+        glm::vec3(4.0, 3.0, 3.0),
+        glm::vec3(0.0, 0.0, 0.0),
+        glm::vec3(0.0, 1.0, 0.0)
+    );
+    let model = glm::mat4(
+        1.0, 1.0, 1.0, 1.0,
+        1.0, 1.0, 1.0, 1.0,
+        1.0, 1.0, 1.0, 1.0,
+        1.0, 1.0, 1.0, 1.0
+    );
+    let mvp = projection * view;
+
+    let matrix_id: GLint;
+    unsafe {
+        let u_name = CStr::from_bytes_with_nul_unchecked("MVP\0".as_bytes()).as_ptr();
+        matrix_id = gl::GetUniformLocation(program_id, u_name);
     }
 
     while !window.should_close() {
@@ -125,6 +146,8 @@ fn main() {
         unsafe {
             gl::ClearColor(0.2, 0.3, 0.3, 1.0);
             gl::Clear(gl::COLOR_BUFFER_BIT | gl::DEPTH_BUFFER_BIT);
+
+            gl::UniformMatrix4fv(matrix_id, 1, gl::FALSE, &mvp[0][0]);
 
             gl::EnableVertexAttribArray(0);
             gl::BindBuffer(gl::ARRAY_BUFFER, vertex_buffer);
