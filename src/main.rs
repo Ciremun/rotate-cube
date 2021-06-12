@@ -82,7 +82,7 @@ fn main() {
     let mut glfw = glfw::init(glfw::FAIL_ON_ERRORS).unwrap();
 
     let (mut window, events) = glfw
-        .create_window(1920, 1080, "uwu window", glfw::WindowMode::Windowed)
+        .create_window(800, 600, "uwu window", glfw::WindowMode::Windowed)
         .expect("Failed to create GLFW window.");
 
     window.set_key_polling(true);
@@ -117,19 +117,19 @@ fn main() {
         gl::UseProgram(program_id);
     }
 
-    let projection = glm::ext::perspective(glm::radians(90.0), (1920 / 1080) as f32, 0.1, 100.0);
+    let projection = glm::ext::perspective(glm::radians(45.0), (1920 / 1080) as f32, 0.1, 100.0);
     let view = glm::ext::look_at(
         glm::vec3(4.0, 3.0, 3.0),
         glm::vec3(0.0, 0.0, 0.0),
         glm::vec3(0.0, 1.0, 0.0)
     );
     let model = glm::mat4(
-        1.0, 1.0, 1.0, 1.0,
-        1.0, 1.0, 1.0, 1.0,
-        1.0, 1.0, 1.0, 1.0,
-        1.0, 1.0, 1.0, 1.0
+        1.0, 0.0, 0.0, 0.0,
+        0.0, 1.0, 0.0, 0.0,
+        0.0, 0.0, 1.0, 0.0,
+        0.0, 0.0, 0.0, 1.0
     );
-    let mvp = projection * view;
+    let mvp = projection * view * model;
 
     let matrix_id: GLint;
     unsafe {
