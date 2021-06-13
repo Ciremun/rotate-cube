@@ -1,7 +1,7 @@
 use std::{convert::TryInto, ffi::*, mem};
 
 use gl::types::*;
-use glfw::{Action, Context, Key};
+use glfw::{Action, Context, Key, OpenGlProfileHint, WindowHint};
 use glfw::ffi::*;
 
 unsafe fn compile_shader(shader_id: GLuint, shader_c_string: &CStr) {
@@ -82,6 +82,10 @@ unsafe fn load_shaders() -> GLuint {
 fn main() {
     let mut glfw = glfw::init(glfw::FAIL_ON_ERRORS).unwrap();
 
+    glfw.window_hint(WindowHint::OpenGlProfile(OpenGlProfileHint::Core));
+    glfw.window_hint(WindowHint::ContextVersionMajor(3));
+    glfw.window_hint(WindowHint::ContextVersionMinor(2));
+
     let (mut window, events) = glfw
         .create_window(1024, 768, "uwu window", glfw::WindowMode::Windowed)
         .expect("Failed to create GLFW window.");
@@ -107,7 +111,7 @@ fn main() {
         gl::BindVertexArray(vertex_array_id);
     }
 
-    let vertex_buffer_data = vec![
+    let vertex_buffer_data: Vec<f32> = vec![
         -1.0, -1.0, -1.0, -1.0, -1.0, 1.0, -1.0, 1.0, 1.0, 1.0, 1.0, -1.0, -1.0, -1.0, -1.0, -1.0,
         1.0, -1.0, 1.0, -1.0, 1.0, -1.0, -1.0, -1.0, 1.0, -1.0, -1.0, 1.0, 1.0, -1.0, 1.0, -1.0,
         -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, 1.0, 1.0, -1.0, 1.0, -1.0, 1.0, -1.0, 1.0,
@@ -117,7 +121,7 @@ fn main() {
         1.0, 1.0, 1.0, 1.0, -1.0, 1.0, 1.0, 1.0, -1.0, 1.0,
     ];
 
-    let color_buffer_data = vec![
+    let color_buffer_data: Vec<f32> = vec![
         0.583, 0.771, 0.014, 0.609, 0.115, 0.436, 0.327, 0.483, 0.844, 0.822, 0.569, 0.201, 0.435,
         0.602, 0.223, 0.310, 0.747, 0.185, 0.597, 0.770, 0.761, 0.559, 0.436, 0.730, 0.359, 0.583,
         0.152, 0.483, 0.596, 0.789, 0.559, 0.861, 0.639, 0.195, 0.548, 0.859, 0.014, 0.184, 0.576,
@@ -139,6 +143,8 @@ fn main() {
             vertex_buffer_data.as_ptr() as *const c_void,
             gl::STATIC_DRAW,
         );
+        gl::EnableVertexAttribArray(0);
+        gl::VertexAttribPointer(0, 3, gl::FLOAT, gl::FALSE, 0, 0 as *const c_void);
     }
 
     let mut color_buffer = 0;
@@ -151,6 +157,8 @@ fn main() {
             color_buffer_data.as_ptr() as *const c_void,
             gl::STATIC_DRAW,
         );
+        gl::EnableVertexAttribArray(1);
+        gl::VertexAttribPointer(1, 3, gl::FLOAT, gl::FALSE, 0, 0 as *const c_void);
     }
 
     let program_id: GLuint;
@@ -236,18 +244,9 @@ fn main() {
         unsafe {
             gl::ClearColor(0.2, 0.3, 0.3, 1.0);
             gl::Clear(gl::COLOR_BUFFER_BIT | gl::DEPTH_BUFFER_BIT);
-            
+
             gl::UniformMatrix4fv(matrix_id, 1, gl::FALSE, &new_mvp[0][0]);
-            
-            gl::EnableVertexAttribArray(0);
-            gl::BindBuffer(gl::ARRAY_BUFFER, vertex_buffer);
-            gl::VertexAttribPointer(0, 3, gl::FLOAT, gl::FALSE, 0, 0 as *const c_void);
-            gl::DrawArrays(gl::TRIANGLES, 0, 12 * 3);
-            gl::DisableVertexAttribArray(0);
-            
-            gl::EnableVertexAttribArray(1);
-            gl::BindBuffer(gl::ARRAY_BUFFER, color_buffer);
-            gl::VertexAttribPointer(1, 3, gl::FLOAT, gl::FALSE, 0, 0 as *const c_void);
+
             gl::DrawArrays(gl::TRIANGLES, 0, 12 * 3);
         }
         window.set_cursor_pos(1024.0 / 2.0, 768.0 / 2.0);
