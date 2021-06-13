@@ -1,7 +1,7 @@
 use std::{convert::TryInto, ffi::*, mem};
 
 use gl::types::*;
-use glfw::{Action, Context, Key};
+use glfw::{Action, Context, Key, OpenGlProfileHint, WindowHint};
 use glfw::ffi::*;
 
 unsafe fn compile_shader(shader_id: GLuint, shader_c_string: &CStr) {
@@ -81,6 +81,10 @@ unsafe fn load_shaders() -> GLuint {
 
 fn main() {
     let mut glfw = glfw::init(glfw::FAIL_ON_ERRORS).unwrap();
+
+    glfw.window_hint(WindowHint::OpenGlProfile(OpenGlProfileHint::Core));
+    glfw.window_hint(WindowHint::ContextVersionMajor(3));
+    glfw.window_hint(WindowHint::ContextVersionMinor(2));
 
     let (mut window, events) = glfw
         .create_window(1024, 768, "uwu window", glfw::WindowMode::Windowed)
