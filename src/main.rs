@@ -92,12 +92,93 @@ fn main() {
     gl::Viewport::load_with(|s| window.get_proc_address(s) as *const _);
 
     unsafe {
+        gl::Enable(gl::DEPTH_TEST);
+        gl::DepthFunc(gl::LESS);
+    }
+
+    unsafe {
         let mut vertex_array_id = 0;
         gl::GenVertexArrays(1, &mut vertex_array_id);
         gl::BindVertexArray(vertex_array_id);
     }
 
-    let vertex_buffer_data = vec![-1.0, -1.0, 0.0, 1.0, -1.0, 0.0, 0.0, 1.0, 0.0];
+    let vertex_buffer_data = vec![
+        -1.0,-1.0,-1.0,
+        -1.0,-1.0, 1.0,
+        -1.0, 1.0, 1.0,
+         1.0, 1.0,-1.0,
+        -1.0,-1.0,-1.0,
+        -1.0, 1.0,-1.0,
+         1.0,-1.0, 1.0,
+        -1.0,-1.0,-1.0,
+         1.0,-1.0,-1.0,
+         1.0, 1.0,-1.0,
+         1.0,-1.0,-1.0,
+        -1.0,-1.0,-1.0,
+        -1.0,-1.0,-1.0,
+        -1.0, 1.0, 1.0,
+        -1.0, 1.0,-1.0,
+         1.0,-1.0, 1.0,
+        -1.0,-1.0, 1.0,
+        -1.0,-1.0,-1.0,
+        -1.0, 1.0, 1.0,
+        -1.0,-1.0, 1.0,
+         1.0,-1.0, 1.0,
+         1.0, 1.0, 1.0,
+         1.0,-1.0,-1.0,
+         1.0, 1.0,-1.0,
+         1.0,-1.0,-1.0,
+         1.0, 1.0, 1.0,
+         1.0,-1.0, 1.0,
+         1.0, 1.0, 1.0,
+         1.0, 1.0,-1.0,
+        -1.0, 1.0,-1.0,
+         1.0, 1.0, 1.0,
+        -1.0, 1.0,-1.0,
+        -1.0, 1.0, 1.0,
+         1.0, 1.0, 1.0,
+        -1.0, 1.0, 1.0,
+         1.0,-1.0, 1.0
+    ];
+
+    let color_buffer_data = vec![
+        0.583,  0.771,  0.014,
+        0.609,  0.115,  0.436,
+        0.327,  0.483,  0.844,
+        0.822,  0.569,  0.201,
+        0.435,  0.602,  0.223,
+        0.310,  0.747,  0.185,
+        0.597,  0.770,  0.761,
+        0.559,  0.436,  0.730,
+        0.359,  0.583,  0.152,
+        0.483,  0.596,  0.789,
+        0.559,  0.861,  0.639,
+        0.195,  0.548,  0.859,
+        0.014,  0.184,  0.576,
+        0.771,  0.328,  0.970,
+        0.406,  0.615,  0.116,
+        0.676,  0.977,  0.133,
+        0.971,  0.572,  0.833,
+        0.140,  0.616,  0.489,
+        0.997,  0.513,  0.064,
+        0.945,  0.719,  0.592,
+        0.543,  0.021,  0.978,
+        0.279,  0.317,  0.505,
+        0.167,  0.620,  0.077,
+        0.347,  0.857,  0.137,
+        0.055,  0.953,  0.042,
+        0.714,  0.505,  0.345,
+        0.783,  0.290,  0.734,
+        0.722,  0.645,  0.174,
+        0.302,  0.455,  0.848,
+        0.225,  0.587,  0.040,
+        0.517,  0.713,  0.338,
+        0.053,  0.959,  0.120,
+        0.393,  0.621,  0.362,
+        0.673,  0.211,  0.457,
+        0.820,  0.883,  0.371,
+        0.982,  0.099,  0.879
+    ];
 
     let mut vertex_buffer = 0;
     unsafe {
@@ -111,13 +192,25 @@ fn main() {
         );
     }
 
+    let mut color_buffer = 0;
+    unsafe {
+        gl::GenBuffers(1, &mut color_buffer);
+        gl::BindBuffer(gl::ARRAY_BUFFER, color_buffer);
+        gl::BufferData(
+            gl::ARRAY_BUFFER,
+            (mem::size_of::<f32>() * color_buffer_data.len()) as isize,
+            color_buffer_data.as_ptr() as *const c_void,
+            gl::STATIC_DRAW,
+        );
+    }
+
     let program_id: GLuint;
     unsafe {
         program_id = load_shaders();
         gl::UseProgram(program_id);
     }
 
-    let projection = glm::ext::perspective(glm::radians(45.0), (1920 / 1080) as f32, 0.1, 100.0);
+    let projection = glm::ext::perspective(glm::radians(60.0), (800 / 600) as f32, 0.1, 100.0);
     let view = glm::ext::look_at(
         glm::vec3(4.0, 3.0, 3.0),
         glm::vec3(0.0, 0.0, 0.0),
@@ -152,8 +245,13 @@ fn main() {
             gl::EnableVertexAttribArray(0);
             gl::BindBuffer(gl::ARRAY_BUFFER, vertex_buffer);
             gl::VertexAttribPointer(0, 3, gl::FLOAT, gl::FALSE, 0, 0 as *const c_void);
-            gl::DrawArrays(gl::TRIANGLES, 0, 3);
+            gl::DrawArrays(gl::TRIANGLES, 0, 12 * 3);
             gl::DisableVertexAttribArray(0);
+
+            gl::EnableVertexAttribArray(1);
+            gl::BindBuffer(gl::ARRAY_BUFFER, color_buffer);
+            gl::VertexAttribPointer(1, 3, gl::FLOAT, gl::FALSE, 0, 0 as *const c_void);
+            gl::DrawArrays(gl::TRIANGLES, 0, 12 * 3);
         }
     }
 }
