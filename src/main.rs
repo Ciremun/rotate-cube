@@ -102,6 +102,7 @@ fn main() {
 
     unsafe {
         gl::Enable(gl::DEPTH_TEST);
+        gl::Enable(gl::CULL_FACE);
         gl::DepthFunc(gl::LESS);
     }
 
@@ -166,17 +167,9 @@ fn main() {
         program_id = load_shaders();
         gl::UseProgram(program_id);
     }
-
-    let projection = glm::ext::perspective(glm::radians(45.0), (1024 / 768) as f32, 0.1, 100.0);
-    let view = glm::ext::look_at(
-        glm::vec3(4.0, 3.0, 3.0),
-        glm::vec3(0.0, 0.0, 0.0),
-        glm::vec3(0.0, 1.0, 0.0),
-    );
     let model = glm::mat4(
         1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0,
     );
-    let mvp = projection * view * model;
 
     let matrix_id: GLint;
     unsafe {
