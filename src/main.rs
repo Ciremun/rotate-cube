@@ -2,6 +2,7 @@ use std::{convert::TryInto, ffi::*, mem};
 
 use gl::types::*;
 use glfw::{Action, Context, Key};
+use glfw::ffi::*;
 
 unsafe fn compile_shader(shader_id: GLuint, shader_c_string: &CStr) {
     let mut compiled = 0;
@@ -87,6 +88,10 @@ fn main() {
 
     window.set_key_polling(true);
     window.make_current();
+
+    unsafe {
+        glfwSetInputMode(window.window_ptr(), CURSOR, CURSOR_HIDDEN);
+    }
 
     gl::load_with(|s| window.get_proc_address(s) as *const _);
     gl::Viewport::load_with(|s| window.get_proc_address(s) as *const _);
