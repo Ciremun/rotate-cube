@@ -143,6 +143,8 @@ fn main() {
             vertex_buffer_data.as_ptr() as *const c_void,
             gl::STATIC_DRAW,
         );
+        gl::EnableVertexAttribArray(0);
+        gl::VertexAttribPointer(0, 3, gl::FLOAT, gl::FALSE, 0, 0 as *const c_void);
     }
 
     let mut color_buffer = 0;
@@ -155,6 +157,8 @@ fn main() {
             color_buffer_data.as_ptr() as *const c_void,
             gl::STATIC_DRAW,
         );
+        gl::EnableVertexAttribArray(1);
+        gl::VertexAttribPointer(1, 3, gl::FLOAT, gl::FALSE, 0, 0 as *const c_void);
     }
 
     let program_id: GLuint;
@@ -240,18 +244,9 @@ fn main() {
         unsafe {
             gl::ClearColor(0.2, 0.3, 0.3, 1.0);
             gl::Clear(gl::COLOR_BUFFER_BIT | gl::DEPTH_BUFFER_BIT);
-            
+
             gl::UniformMatrix4fv(matrix_id, 1, gl::FALSE, &new_mvp[0][0]);
-            
-            gl::EnableVertexAttribArray(0);
-            gl::BindBuffer(gl::ARRAY_BUFFER, vertex_buffer);
-            gl::VertexAttribPointer(0, 3, gl::FLOAT, gl::FALSE, 0, 0 as *const c_void);
-            gl::DrawArrays(gl::TRIANGLES, 0, 12 * 3);
-            gl::DisableVertexAttribArray(0);
-            
-            gl::EnableVertexAttribArray(1);
-            gl::BindBuffer(gl::ARRAY_BUFFER, color_buffer);
-            gl::VertexAttribPointer(1, 3, gl::FLOAT, gl::FALSE, 0, 0 as *const c_void);
+
             gl::DrawArrays(gl::TRIANGLES, 0, 12 * 3);
         }
         window.set_cursor_pos(1024.0 / 2.0, 768.0 / 2.0);
