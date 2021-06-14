@@ -233,13 +233,13 @@ fn main() {
         matrix_id = gl::GetUniformLocation(program_id, u_name);
     }
 
-    let mut position = glm::vec3(0.0, 0.0, 5.0);
-    let mut horizontal_angle = 3.14;
-    let mut vertical_angle = 0.0;
+    let mut position = glm::vec3(1.5, 1.5, 1.5);
+    let mut horizontal_angle = 3.86;
+    let mut vertical_angle = -0.63;
     let field_of_view = 90.0;
 
-    let speed = 3.0;
-    let mouse_speed = 0.05;
+    let speed = 5.0;
+    let mouse_speed = 0.1;
 
     let mut delta_time: f32;
     let mut last_frame = glfw.get_time();
