@@ -90,6 +90,7 @@ fn main() {
         .create_window(1024, 768, "uwu window", glfw::WindowMode::Windowed)
         .expect("Failed to create GLFW window.");
 
+    window.set_focus_polling(true);
     window.set_key_polling(true);
     window.make_current();
 
@@ -234,8 +235,8 @@ fn main() {
     }
 
     let mut position = glm::vec3(1.5, 1.5, 1.5);
-    let mut horizontal_angle = 3.86;
-    let mut vertical_angle = -0.63;
+    let mut horizontal_angle: f32 = 3.86;
+    let mut vertical_angle: f32 = -0.63;
     let field_of_view = 90.0;
 
     let speed = 5.0;
@@ -243,6 +244,7 @@ fn main() {
 
     let mut delta_time: f32;
     let mut last_frame = glfw.get_time();
+    let mut focused = true;
 
     while !window.should_close() {
         let current_frame = glfw.get_time();
@@ -251,25 +253,34 @@ fn main() {
         window.swap_buffers();
         glfw.poll_events();
         for (_, event) in glfw::flush_messages(&events) {
-            handle_window_event(&mut window, event);
+            match event {
+                glfw::WindowEvent::Focus(f) => focused = f,
+                _ => handle_window_event(&mut window, event)
+            }
         }
-        let (xpos, ypos) = window.get_cursor_pos();
-        horizontal_angle += mouse_speed * delta_time * (1024.0 / 2.0 - xpos) as f32;
-        vertical_angle += mouse_speed * delta_time * (768.0 / 2.0 - ypos) as f32;
+    
         let direction = glm::vec3(
             (vertical_angle.cos() * horizontal_angle.sin()) as f32,
             vertical_angle.sin() as f32,
             (vertical_angle.cos() * horizontal_angle.cos()) as f32,
         );
-        let right = glm::vec3(
-            (horizontal_angle - 3.14 / 2.0).sin() as f32,
-            0.0,
-            (horizontal_angle - 3.14 / 2.0).cos() as f32,
-        );
-        if window.get_key(glfw::Key::W) == glfw::Action::Press { position = position + direction * delta_time * speed; }
-        if window.get_key(glfw::Key::S) == glfw::Action::Press { position = position - direction * delta_time * speed; }
-        if window.get_key(glfw::Key::D) == glfw::Action::Press { position = position + right     * delta_time * speed; }
-        if window.get_key(glfw::Key::A) == glfw::Action::Press { position = position - right     * delta_time * speed; }
+
+        if focused {
+            let (xpos, ypos)  = window.get_cursor_pos();
+            horizontal_angle += mouse_speed * delta_time * (1024.0 / 2.0 - xpos) as f32;
+            vertical_angle   += mouse_speed * delta_time * ( 768.0 / 2.0 - ypos) as f32;
+            let right = glm::vec3(
+                (horizontal_angle - 3.14 / 2.0).sin() as f32,
+                0.0,
+                (horizontal_angle - 3.14 / 2.0).cos() as f32,
+            );
+            if window.get_key(glfw::Key::W) == glfw::Action::Press { position = position + direction * delta_time * speed; }
+            if window.get_key(glfw::Key::S) == glfw::Action::Press { position = position - direction * delta_time * speed; }
+            if window.get_key(glfw::Key::D) == glfw::Action::Press { position = position + right     * delta_time * speed; }
+            if window.get_key(glfw::Key::A) == glfw::Action::Press { position = position - right     * delta_time * speed; }
+            window.set_cursor_pos(1024.0 / 2.0, 768.0 / 2.0);
+        }
+
         let projection_matrix =
             glm::ext::perspective(glm::radians(field_of_view), 4.0 / 3.0, 0.1, 100.0);
         let view_matrix =
@@ -283,7 +294,6 @@ fn main() {
 
             gl::DrawArrays(gl::TRIANGLES, 0, 12 * 3);
         }
-        window.set_cursor_pos(1024.0 / 2.0, 768.0 / 2.0);
     }
 }
 
