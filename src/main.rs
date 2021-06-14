@@ -1,8 +1,8 @@
 use std::{convert::TryInto, ffi::*, mem};
 
 use gl::types::*;
-use glfw::{Action, Context, Key, OpenGlProfileHint, WindowHint};
 use glfw::ffi::*;
+use glfw::{Action, Context, Key, OpenGlProfileHint, WindowHint};
 
 unsafe fn compile_shader(shader_id: GLuint, shader_c_string: &CStr) {
     let mut compiled = 0;
@@ -180,13 +180,13 @@ fn main() {
     let mut position = glm::vec3(0.0, 0.0, 5.0);
     let mut horizontal_angle = 3.14;
     let mut vertical_angle = 0.0;
-    let initial_field_of_view = 45.0;
+    let field_of_view = 90.0;
 
     let speed = 3.0;
     let mouse_speed = 0.05;
 
     let mut delta_time: f32;
-    let mut last_frame = 0.0;
+    let mut last_frame = glfw.get_time();
 
     while !window.should_close() {
         let current_frame = glfw.get_time();
@@ -208,31 +208,16 @@ fn main() {
         let right = glm::vec3(
             (horizontal_angle - 3.14 / 2.0).sin() as f32,
             0.0,
-            (horizontal_angle - 3.14 / 2.0).cos() as f32
+            (horizontal_angle - 3.14 / 2.0).cos() as f32,
         );
-        let up = glm::cross(right, direction);
-        // Move forward
-        if window.get_key(glfw::Key::W) == glfw::Action::Press {
-            position = position + direction * delta_time * speed;
-        }
-        // Move backward
-        if window.get_key(glfw::Key::S) == glfw::Action::Press {
-            position = position - direction * delta_time * speed;
-        }
-        // Strafe right
-        if window.get_key(glfw::Key::D) == glfw::Action::Press {
-            position = position + right * delta_time * speed;
-        }
-        // Strafe left
-        if window.get_key(glfw::Key::A) == glfw::Action::Press {
-            position = position - right * delta_time * speed;
-        }
-        let projection_matrix = glm::ext::perspective(glm::radians(initial_field_of_view), 4.0 / 3.0, 0.1, 100.0);
-        let view_matrix = glm::ext::look_at(
-            position,           // Camera is here
-            position+direction, // and looks here : at the same position, plus "direction"
-            up                  // Head is up (set to 0,-1,0 to look upside-down)
-        );
+        if window.get_key(glfw::Key::W) == glfw::Action::Press { position = position + direction * delta_time * speed; }
+        if window.get_key(glfw::Key::S) == glfw::Action::Press { position = position - direction * delta_time * speed; }
+        if window.get_key(glfw::Key::D) == glfw::Action::Press { position = position + right     * delta_time * speed; }
+        if window.get_key(glfw::Key::A) == glfw::Action::Press { position = position - right     * delta_time * speed; }
+        let projection_matrix =
+            glm::ext::perspective(glm::radians(field_of_view), 4.0 / 3.0, 0.1, 100.0);
+        let view_matrix =
+            glm::ext::look_at(position, position + direction, glm::vec3(0.0, 1.0, 0.0));
         let new_mvp = projection_matrix * view_matrix * model;
         unsafe {
             gl::ClearColor(0.2, 0.3, 0.3, 1.0);
