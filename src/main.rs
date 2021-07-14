@@ -176,6 +176,7 @@ fn main() {
         1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0,
     );
     let mut right_model = glm::ext::translate(&model, glm::vec3(5.0, 0.0, 0.0));
+    right_model = glm::ext::scale(&right_model, glm::vec3(0.3, 0.3, 0.3));
 
     let matrix_id: GLint;
     unsafe {
@@ -276,7 +277,7 @@ fn main() {
                 gl::DrawArrays(gl::TRIANGLES, 0, 12 * 3);
                 right_model = glm::ext::rotate(
                     &right_model,
-                    glm::radians(cube_rotation),
+                    glm::radians(cube_rotation * 3.0),
                     glm::vec3(1.0, 1.0, 0.0),
                 );
                 new_mvp = projection_matrix * view_matrix * right_model;
