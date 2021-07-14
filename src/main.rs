@@ -2,7 +2,7 @@ use std::{convert::TryInto, ffi::*, mem};
 
 use gl::types::*;
 use glfw::ffi::*;
-use glfw::{Action, Context, Key, OpenGlProfileHint, WindowHint};
+use glfw::{Action, Context, Key, OpenGlProfileHint, WindowHint, MouseButton};
 
 unsafe fn compile_shader(shader_id: GLuint, shader_c_string: &CStr) {
     let mut compiled = 0;
@@ -93,6 +93,8 @@ fn main() {
     window.set_focus_polling(true);
     window.set_key_polling(true);
     window.make_current();
+
+    unsafe { glfwSwapInterval(-1); }
 
     unsafe {
         glfwSetInputMode(window.window_ptr(), CURSOR, CURSOR_HIDDEN);
@@ -245,6 +247,7 @@ fn main() {
     let mut delta_time: f32;
     let mut last_frame = glfw.get_time();
     let mut focused = true;
+    let mut cube_rotation = 0.0;
 
     while !window.should_close() {
         let current_frame = glfw.get_time();
@@ -265,10 +268,22 @@ fn main() {
             (vertical_angle.cos() * horizontal_angle.cos()) as f32,
         );
 
+        let projection_matrix =
+            glm::ext::perspective(glm::radians(field_of_view), 4.0 / 3.0, 0.1, 100.0);
+        let view_matrix =
+            glm::ext::look_at(position, position + direction, glm::vec3(0.0, 1.0, 0.0));
+        let mut new_mvp = projection_matrix * view_matrix * model;
+
         if focused {
             let (xpos, ypos)  = window.get_cursor_pos();
             horizontal_angle += mouse_speed * delta_time * (1024.0 / 2.0 - xpos) as f32;
             vertical_angle   += mouse_speed * delta_time * ( 768.0 / 2.0 - ypos) as f32;
+            let lmb = window.get_mouse_button(MouseButton::Button1);
+            if lmb == Action::Press {
+                cube_rotation += 1.0 % 180.0;
+            }
+            new_mvp = glm::ext::rotate(&new_mvp, glm::radians(cube_rotation), glm::vec3(1.0, 0.0, 0.0));
+            new_mvp = glm::ext::rotate(&new_mvp, glm::radians(cube_rotation), glm::vec3(0.0, 1.0, 0.0));
             let right = glm::vec3(
                 (horizontal_angle - 3.14 / 2.0).sin() as f32,
                 0.0,
@@ -281,11 +296,6 @@ fn main() {
             window.set_cursor_pos(1024.0 / 2.0, 768.0 / 2.0);
         }
 
-        let projection_matrix =
-            glm::ext::perspective(glm::radians(field_of_view), 4.0 / 3.0, 0.1, 100.0);
-        let view_matrix =
-            glm::ext::look_at(position, position + direction, glm::vec3(0.0, 1.0, 0.0));
-        let new_mvp = projection_matrix * view_matrix * model;
         unsafe {
             gl::ClearColor(0.2, 0.3, 0.3, 1.0);
             gl::Clear(gl::COLOR_BUFFER_BIT | gl::DEPTH_BUFFER_BIT);
