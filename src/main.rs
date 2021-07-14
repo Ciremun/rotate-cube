@@ -226,7 +226,7 @@ fn main() {
         program_id = load_shaders();
         gl::UseProgram(program_id);
     }
-    let model = glm::mat4(
+    let mut model = glm::mat4(
         1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0,
     );
 
@@ -268,22 +268,27 @@ fn main() {
             (vertical_angle.cos() * horizontal_angle.cos()) as f32,
         );
 
+        let lmb = window.get_mouse_button(MouseButton::Button1);
+        if lmb == Action::Press {
+            cube_rotation += 0.1 % 180.0;
+        }
+        let rmb = window.get_mouse_button(MouseButton::Button2);
+        if rmb == Action::Press {
+            cube_rotation -= 0.1 % 180.0;
+        }
+        model = glm::ext::rotate(&model, glm::radians(cube_rotation), glm::vec3(1.0, 0.0, 0.0));
+        model = glm::ext::rotate(&model, glm::radians(cube_rotation), glm::vec3(0.0, 1.0, 0.0));
+    
         let projection_matrix =
             glm::ext::perspective(glm::radians(field_of_view), 4.0 / 3.0, 0.1, 100.0);
         let view_matrix =
             glm::ext::look_at(position, position + direction, glm::vec3(0.0, 1.0, 0.0));
-        let mut new_mvp = projection_matrix * view_matrix * model;
+        let new_mvp = projection_matrix * view_matrix * model;
 
         if focused {
             let (xpos, ypos)  = window.get_cursor_pos();
             horizontal_angle += mouse_speed * delta_time * (1024.0 / 2.0 - xpos) as f32;
             vertical_angle   += mouse_speed * delta_time * ( 768.0 / 2.0 - ypos) as f32;
-            let lmb = window.get_mouse_button(MouseButton::Button1);
-            if lmb == Action::Press {
-                cube_rotation += 1.0 % 180.0;
-            }
-            new_mvp = glm::ext::rotate(&new_mvp, glm::radians(cube_rotation), glm::vec3(1.0, 0.0, 0.0));
-            new_mvp = glm::ext::rotate(&new_mvp, glm::radians(cube_rotation), glm::vec3(0.0, 1.0, 0.0));
             let right = glm::vec3(
                 (horizontal_angle - 3.14 / 2.0).sin() as f32,
                 0.0,
