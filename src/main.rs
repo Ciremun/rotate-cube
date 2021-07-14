@@ -2,7 +2,7 @@ use std::{convert::TryInto, ffi::*, mem};
 
 use gl::types::*;
 use glfw::ffi::*;
-use glfw::{Action, Context, Key, OpenGlProfileHint, WindowHint, MouseButton};
+use glfw::{Action, Context, Key, MouseButton, OpenGlProfileHint, WindowHint};
 
 unsafe fn compile_shader(shader_id: GLuint, shader_c_string: &CStr) {
     let mut compiled = 0;
@@ -94,7 +94,9 @@ fn main() {
     window.set_key_polling(true);
     window.make_current();
 
-    unsafe { glfwSwapInterval(-1); }
+    unsafe {
+        glfwSwapInterval(-1);
+    }
 
     unsafe {
         glfwSetInputMode(window.window_ptr(), CURSOR, CURSOR_HIDDEN);
@@ -116,81 +118,25 @@ fn main() {
     }
 
     let vertex_buffer_data: Vec<f32> = vec![
-        -1.0,-1.0,-1.0,
-        -1.0,-1.0, 1.0,
-        -1.0, 1.0, 1.0,
-         1.0, 1.0,-1.0,
-        -1.0,-1.0,-1.0,
-        -1.0, 1.0,-1.0,
-         1.0,-1.0, 1.0,
-        -1.0,-1.0,-1.0,
-         1.0,-1.0,-1.0,
-         1.0, 1.0,-1.0,
-         1.0,-1.0,-1.0,
-        -1.0,-1.0,-1.0,
-        -1.0,-1.0,-1.0,
-        -1.0, 1.0, 1.0,
-        -1.0, 1.0,-1.0,
-         1.0,-1.0, 1.0,
-        -1.0,-1.0, 1.0,
-        -1.0,-1.0,-1.0,
-        -1.0, 1.0, 1.0,
-        -1.0,-1.0, 1.0,
-         1.0,-1.0, 1.0,
-         1.0, 1.0, 1.0,
-         1.0,-1.0,-1.0,
-         1.0, 1.0,-1.0,
-         1.0,-1.0,-1.0,
-         1.0, 1.0, 1.0,
-         1.0,-1.0, 1.0,
-         1.0, 1.0, 1.0,
-         1.0, 1.0,-1.0,
-        -1.0, 1.0,-1.0,
-         1.0, 1.0, 1.0,
-        -1.0, 1.0,-1.0,
-        -1.0, 1.0, 1.0,
-         1.0, 1.0, 1.0,
-        -1.0, 1.0, 1.0,
-         1.0,-1.0, 1.0
+        -1.0, -1.0, -1.0, -1.0, -1.0, 1.0, -1.0, 1.0, 1.0, 1.0, 1.0, -1.0, -1.0, -1.0, -1.0, -1.0,
+        1.0, -1.0, 1.0, -1.0, 1.0, -1.0, -1.0, -1.0, 1.0, -1.0, -1.0, 1.0, 1.0, -1.0, 1.0, -1.0,
+        -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, 1.0, 1.0, -1.0, 1.0, -1.0, 1.0, -1.0, 1.0,
+        -1.0, -1.0, 1.0, -1.0, -1.0, -1.0, -1.0, 1.0, 1.0, -1.0, -1.0, 1.0, 1.0, -1.0, 1.0, 1.0,
+        1.0, 1.0, 1.0, -1.0, -1.0, 1.0, 1.0, -1.0, 1.0, -1.0, -1.0, 1.0, 1.0, 1.0, 1.0, -1.0, 1.0,
+        1.0, 1.0, 1.0, 1.0, 1.0, -1.0, -1.0, 1.0, -1.0, 1.0, 1.0, 1.0, -1.0, 1.0, -1.0, -1.0, 1.0,
+        1.0, 1.0, 1.0, 1.0, -1.0, 1.0, 1.0, 1.0, -1.0, 1.0,
     ];
 
     let color_buffer_data: Vec<f32> = vec![
-        0.583,  0.771,  0.014,
-        0.609,  0.115,  0.436,
-        0.327,  0.483,  0.844,
-        0.822,  0.569,  0.201,
-        0.435,  0.602,  0.223,
-        0.310,  0.747,  0.185,
-        0.597,  0.770,  0.761,
-        0.559,  0.436,  0.730,
-        0.359,  0.583,  0.152,
-        0.483,  0.596,  0.789,
-        0.559,  0.861,  0.639,
-        0.195,  0.548,  0.859,
-        0.014,  0.184,  0.576,
-        0.771,  0.328,  0.970,
-        0.406,  0.615,  0.116,
-        0.676,  0.977,  0.133,
-        0.971,  0.572,  0.833,
-        0.140,  0.616,  0.489,
-        0.997,  0.513,  0.064,
-        0.945,  0.719,  0.592,
-        0.543,  0.021,  0.978,
-        0.279,  0.317,  0.505,
-        0.167,  0.620,  0.077,
-        0.347,  0.857,  0.137,
-        0.055,  0.953,  0.042,
-        0.714,  0.505,  0.345,
-        0.783,  0.290,  0.734,
-        0.722,  0.645,  0.174,
-        0.302,  0.455,  0.848,
-        0.225,  0.587,  0.040,
-        0.517,  0.713,  0.338,
-        0.053,  0.959,  0.120,
-        0.393,  0.621,  0.362,
-        0.673,  0.211,  0.457,
-        0.820,  0.883,  0.371,
-        0.982,  0.099,  0.879
+        0.583, 0.771, 0.014, 0.609, 0.115, 0.436, 0.327, 0.483, 0.844, 0.822, 0.569, 0.201, 0.435,
+        0.602, 0.223, 0.310, 0.747, 0.185, 0.597, 0.770, 0.761, 0.559, 0.436, 0.730, 0.359, 0.583,
+        0.152, 0.483, 0.596, 0.789, 0.559, 0.861, 0.639, 0.195, 0.548, 0.859, 0.014, 0.184, 0.576,
+        0.771, 0.328, 0.970, 0.406, 0.615, 0.116, 0.676, 0.977, 0.133, 0.971, 0.572, 0.833, 0.140,
+        0.616, 0.489, 0.997, 0.513, 0.064, 0.945, 0.719, 0.592, 0.543, 0.021, 0.978, 0.279, 0.317,
+        0.505, 0.167, 0.620, 0.077, 0.347, 0.857, 0.137, 0.055, 0.953, 0.042, 0.714, 0.505, 0.345,
+        0.783, 0.290, 0.734, 0.722, 0.645, 0.174, 0.302, 0.455, 0.848, 0.225, 0.587, 0.040, 0.517,
+        0.713, 0.338, 0.053, 0.959, 0.120, 0.393, 0.621, 0.362, 0.673, 0.211, 0.457, 0.820, 0.883,
+        0.371, 0.982, 0.099, 0.879,
     ];
 
     let mut vertex_buffer = 0;
@@ -229,6 +175,7 @@ fn main() {
     let mut model = glm::mat4(
         1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0,
     );
+    let mut right_model = glm::ext::translate(&model, glm::vec3(5.0, 0.0, 0.0));
 
     let matrix_id: GLint;
     unsafe {
@@ -236,8 +183,8 @@ fn main() {
         matrix_id = gl::GetUniformLocation(program_id, u_name);
     }
 
-    let mut position = glm::vec3(1.5, 1.5, 1.5);
-    let mut horizontal_angle: f32 = 3.86;
+    let mut position = glm::vec3(2.6, 2.0, 3.5);
+    let mut horizontal_angle: f32 = 3.15;
     let mut vertical_angle: f32 = -0.63;
     let field_of_view = 90.0;
 
@@ -247,7 +194,7 @@ fn main() {
     let mut delta_time: f32;
     let mut last_frame = glfw.get_time();
     let mut focused = true;
-    let mut cube_rotation = 0.0;
+    let cube_rotation = 5.0;
 
     while !window.should_close() {
         let current_frame = glfw.get_time();
@@ -258,46 +205,36 @@ fn main() {
         for (_, event) in glfw::flush_messages(&events) {
             match event {
                 glfw::WindowEvent::Focus(f) => focused = f,
-                _ => handle_window_event(&mut window, event)
+                _ => handle_window_event(&mut window, event),
             }
         }
-    
         let direction = glm::vec3(
             (vertical_angle.cos() * horizontal_angle.sin()) as f32,
             vertical_angle.sin() as f32,
             (vertical_angle.cos() * horizontal_angle.cos()) as f32,
         );
 
-        let lmb = window.get_mouse_button(MouseButton::Button1);
-        if lmb == Action::Press {
-            cube_rotation += 0.1 % 180.0;
-        }
-        let rmb = window.get_mouse_button(MouseButton::Button2);
-        if rmb == Action::Press {
-            cube_rotation -= 0.1 % 180.0;
-        }
-        model = glm::ext::rotate(&model, glm::radians(cube_rotation), glm::vec3(1.0, 0.0, 0.0));
-        model = glm::ext::rotate(&model, glm::radians(cube_rotation), glm::vec3(0.0, 1.0, 0.0));
-    
-        let projection_matrix =
-            glm::ext::perspective(glm::radians(field_of_view), 4.0 / 3.0, 0.1, 100.0);
-        let view_matrix =
-            glm::ext::look_at(position, position + direction, glm::vec3(0.0, 1.0, 0.0));
-        let new_mvp = projection_matrix * view_matrix * model;
-
         if focused {
-            let (xpos, ypos)  = window.get_cursor_pos();
+            let (xpos, ypos) = window.get_cursor_pos();
             horizontal_angle += mouse_speed * delta_time * (1024.0 / 2.0 - xpos) as f32;
-            vertical_angle   += mouse_speed * delta_time * ( 768.0 / 2.0 - ypos) as f32;
+            vertical_angle += mouse_speed * delta_time * (768.0 / 2.0 - ypos) as f32;
             let right = glm::vec3(
                 (horizontal_angle - 3.14 / 2.0).sin() as f32,
                 0.0,
                 (horizontal_angle - 3.14 / 2.0).cos() as f32,
             );
-            if window.get_key(glfw::Key::W) == glfw::Action::Press { position = position + direction * delta_time * speed; }
-            if window.get_key(glfw::Key::S) == glfw::Action::Press { position = position - direction * delta_time * speed; }
-            if window.get_key(glfw::Key::D) == glfw::Action::Press { position = position + right     * delta_time * speed; }
-            if window.get_key(glfw::Key::A) == glfw::Action::Press { position = position - right     * delta_time * speed; }
+            if window.get_key(glfw::Key::W) == glfw::Action::Press {
+                position = position + direction * delta_time * speed;
+            }
+            if window.get_key(glfw::Key::S) == glfw::Action::Press {
+                position = position - direction * delta_time * speed;
+            }
+            if window.get_key(glfw::Key::D) == glfw::Action::Press {
+                position = position + right * delta_time * speed;
+            }
+            if window.get_key(glfw::Key::A) == glfw::Action::Press {
+                position = position - right * delta_time * speed;
+            }
             window.set_cursor_pos(1024.0 / 2.0, 768.0 / 2.0);
         }
 
@@ -305,9 +242,56 @@ fn main() {
             gl::ClearColor(0.2, 0.3, 0.3, 1.0);
             gl::Clear(gl::COLOR_BUFFER_BIT | gl::DEPTH_BUFFER_BIT);
 
-            gl::UniformMatrix4fv(matrix_id, 1, gl::FALSE, &new_mvp[0][0]);
+            let mut left_active = false;
+            let mut right_active = false;
 
-            gl::DrawArrays(gl::TRIANGLES, 0, 12 * 3);
+            if window.get_mouse_button(MouseButton::Button1) == Action::Press {
+                left_active = true;
+            }
+            if window.get_mouse_button(MouseButton::Button2) == Action::Press {
+                right_active = true;
+            }
+
+            let projection_matrix =
+                glm::ext::perspective(glm::radians(field_of_view), 4.0 / 3.0, 0.1, 100.0);
+            let view_matrix =
+                glm::ext::look_at(position, position + direction, glm::vec3(0.0, 1.0, 0.0));
+            if left_active {
+                model = glm::ext::rotate(
+                    &model,
+                    glm::radians(cube_rotation),
+                    glm::vec3(1.0, 1.0, 0.0),
+                );
+                let mut new_mvp = projection_matrix * view_matrix * model;
+                gl::UniformMatrix4fv(matrix_id, 1, gl::FALSE, &new_mvp[0][0]);
+                gl::DrawArrays(gl::TRIANGLES, 0, 12 * 3);
+
+                new_mvp = projection_matrix * view_matrix * right_model;
+                gl::UniformMatrix4fv(matrix_id, 1, gl::FALSE, &new_mvp[0][0]);
+                gl::DrawArrays(gl::TRIANGLES, 0, 12 * 3);
+            }
+            if right_active {
+                let mut new_mvp = projection_matrix * view_matrix * model;
+                gl::UniformMatrix4fv(matrix_id, 1, gl::FALSE, &new_mvp[0][0]);
+                gl::DrawArrays(gl::TRIANGLES, 0, 12 * 3);
+                right_model = glm::ext::rotate(
+                    &right_model,
+                    glm::radians(cube_rotation),
+                    glm::vec3(1.0, 1.0, 0.0),
+                );
+                new_mvp = projection_matrix * view_matrix * right_model;
+                gl::UniformMatrix4fv(matrix_id, 1, gl::FALSE, &new_mvp[0][0]);
+                gl::DrawArrays(gl::TRIANGLES, 0, 12 * 3);
+            }
+            if !left_active && !right_active {
+                let mut new_mvp = projection_matrix * view_matrix * model;
+                gl::UniformMatrix4fv(matrix_id, 1, gl::FALSE, &new_mvp[0][0]);
+                gl::DrawArrays(gl::TRIANGLES, 0, 12 * 3);
+
+                new_mvp = projection_matrix * view_matrix * right_model;
+                gl::UniformMatrix4fv(matrix_id, 1, gl::FALSE, &new_mvp[0][0]);
+                gl::DrawArrays(gl::TRIANGLES, 0, 12 * 3);
+            }
         }
     }
 }
